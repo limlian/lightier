@@ -1,6 +1,6 @@
 package lightier.util;
 
-public class ConsoleReporter extends BasicReporter implements Reporter {
+public class ConsoleReporter extends BasicReporter {
 
 	public void printReport() {
 		// TODO Auto-generated method stub
