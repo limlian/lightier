@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="lightier" basedir="." default="usage">
+	<property name="src" location="src" />
+	<property name="test" location="test" />
+	<property name="config" location="config" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+
+	<path id="master-classpath">
+		<fileset dir="lib">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement path="${build}" />
+	</path>
+	
+	<path id="test-classpath">
+		<fileset dir="lib">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement path="${build}"/>
+	</path>	
+
+	<target name="usage">
+		<echo message="hello,world"/>
+	</target>
+	
+	<target name="init" depends="clean">
+		<tstamp />
+		<mkdir dir="${build}" />
+		<copy todir="${build}">
+			<fileset dir="${config}">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>		
+	</target>
+	
+	<target name="build" depends="init"
+		description="build the source" >
+		<javac destdir="${build}" source="1.5" target="1.5" debug="true" 
+			deprecation="false" optimize="false" failonerror="true">
+			<src path="${src}" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+	
+	<target name="buildtests" depends="init, build"
+		description="build the test source" >
+		<javac destdir="${build}" source="1.5" target="1.5" debug="true" 
+			deprecation="false" optimize="false" failonerror="true">
+			<src path="${test}" />
+			<classpath refid="master-classpath" />
+		</javac>		
+	</target>
+	
+	<target name="tests" depends="buildtests"
+		description="run unit tests">
+		<junit printsummary="on"
+			fork="false"
+			haltonfailure="false"
+			failureproperty="tests.failed"
+			showoutput="true">
+			<classpath refid="test-classpath" />
+			<formatter type="plain" usefile="false" />
+			
+			<batchtest>
+				<fileset dir="${build}">
+					<include name="**/*Tests.*" />
+				</fileset>
+			</batchtest>
+		</junit>
+		
+		<fail if="tests.failed">
+			test.failed=${tests.failed}
+			***********************************************************
+            ***********************************************************
+            ****  One or more tests failed!  Check the output ...  ****
+            ***********************************************************
+            ***********************************************************
+		</fail>	
+	</target>
+	
+	<target name="clean" description="clean up">
+		<delete dir="${build}"/>
+	</target>
+</project>
